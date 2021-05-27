@@ -1,8 +1,0 @@
-{
-    "name": "drupal/kafka-event-publisher",
-    "description": "Kafka event publisher for Drupal events",
-    "type": "drupal-module",
-    "require": {
-        "drupal/core": "^8 || ^9"
-    }
-}

@@ -1,9 +1,0 @@
-kong_api_publisher.admin_settings:
-  path: "/admin/config/kong-api-publisher"
-  defaults:
-    _form: '\Drupal\kong_api_publisher\Form\ImportForm'
-    _title: "Import Open API Spec to Kong"
-  requirements:
-    _permission: "administer site configuration"
-  options:
-    _admin_route: TRUE
