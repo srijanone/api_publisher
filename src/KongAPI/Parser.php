@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\kong_api_publisher\OAS2Kong;
+namespace Drupal\kong_api_publisher\KongAPI;
 
 use Symfony\Component\Yaml\Yaml;
 

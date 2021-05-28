@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\kong_api_publisher\OAS2Kong\KongEntity;
+namespace Drupal\kong_api_publisher\KongAPI\KongEntity;
 
 class OpenAPI2Kong extends OpenAPIKong {
 

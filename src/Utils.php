@@ -4,6 +4,6 @@ namespace Drupal\kong_api_publisher;
 
 class Utils {
   public static function logger() {
-    return \Drupal::logger('OAS2Kong');
+    return \Drupal::logger('kong_api_publisher');
   }
 }
