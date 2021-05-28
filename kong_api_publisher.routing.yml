@@ -1,8 +1,18 @@
-kong_api_publisher.admin_settings:
-  path: "/admin/config/kong-api-publisher"
+kong_api_publisher.import_swagger:
+  path: "/admin/config/kong-api-publisher/import-oas"
   defaults:
     _form: '\Drupal\kong_api_publisher\Form\ImportForm'
     _title: "Import Open API Spec to Kong"
+  requirements:
+    _permission: "administer site configuration"
+  options:
+    _admin_route: TRUE
+
+kong_api_publisher.configuration_form:
+  path: "/admin/config/kong-api-publisher/config"
+  defaults:
+    _form: '\Drupal\kong_api_publisher\Form\KongConfigurationForm'
+    _title: "kong Configuration"
   requirements:
     _permission: "administer site configuration"
   options:

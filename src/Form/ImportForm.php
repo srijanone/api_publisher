@@ -4,10 +4,10 @@ namespace Drupal\kong_api_publisher\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\kong_api_publisher\OAS2Kong\KongEntity\OpenAPI2Kong;
-use Drupal\kong_api_publisher\OAS2Kong\KongEntity\OpenAPI3Kong;
-use Drupal\kong_api_publisher\OAS2Kong\KongHttpRequest;
-use Drupal\kong_api_publisher\OAS2Kong\Parser;
+use Drupal\kong_api_publisher\KongAPI\KongEntity\OpenAPI2Kong;
+use Drupal\kong_api_publisher\KongAPI\KongEntity\OpenAPI3Kong;
+use Drupal\kong_api_publisher\KongAPI\KongHttpRequest;
+use Drupal\kong_api_publisher\KongAPI\Parser;
 use Drupal\kong_api_publisher\Utils;
 
 class ImportForm extends FormBase {
@@ -87,9 +87,11 @@ class ImportForm extends FormBase {
   }
 
   private function importKongConfig($spec, $version) {
+    $config = \Drupal::config(KongConfigurationForm::CONFIG_ID);
     $kongHttp = new KongHttpRequest([
-      'base_url' => 'kong:8001',
+      'base_url' => $config->get('admin_url'),
     ]);
+
     $kongEntity = null;
 
     switch ($version) {
@@ -100,7 +102,7 @@ class ImportForm extends FormBase {
         $kongEntity = new OpenAPI3Kong($spec);
         break;
     }
-    dsm($kongEntity->getRoutes());
+
     $kongHttp->addService($kongEntity->getServices());
     $kongHttp->addRoutes($kongEntity->getRoutes());
     $this->messenger()->addStatus($this->t('Succesfully imported'));

@@ -1,0 +1,9 @@
+kong_api_publisher.tabs.oas_import:
+  route_name: kong_api_publisher.import_swagger
+  title: OAS import
+  base_route: kong_api_publisher.import_swagger
+
+kong_api_publisher.tabs.kong_config:
+  route_name: kong_api_publisher.configuration_form
+  title: Kong configuration
+  base_route: kong_api_publisher.import_swagger
