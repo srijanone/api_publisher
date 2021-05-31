@@ -34,6 +34,7 @@ class KongConfigurationForm extends ConfigFormBase {
       '#title' => $this->t('Kong admin API'),
       '#description' => $this->t('Enter kong admin URL i.e. localhost:8001'),
       '#default_value' => $config->get('admin_url'),
+      '#required' => true,
     );
 
     return parent::buildForm($form, $form_state);
