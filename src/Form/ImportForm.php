@@ -75,7 +75,9 @@ class ImportForm extends FormBase {
     $format = $form_state->getValue('oas_format');
 
     try {
+      // Parse Yml or Json string
       $parsedSpec = Parser::parse($spec, $format);
+      // Importing parsed OAS into kong API gateway
       $this->importKongConfig($parsedSpec, $version);
     } catch (\Exception $e) {
       $this->messenger()->addError($this->t('Error in importing. <p>%msg</p>', [
@@ -86,8 +88,16 @@ class ImportForm extends FormBase {
     }
   }
 
+  /**
+   * Importing OAS spec into kong API gateway
+   *
+   * @param Array $spec OAS parsed array
+   * @param Number $version OAS version i.e. either OAS2 or OAS3
+   */
   private function importKongConfig($spec, $version) {
     $config = \Drupal::config(KongConfigurationForm::CONFIG_ID);
+
+    // creating kong http request based on configuration
     $kongHttp = new KongHttpRequest([
       'base_url' => $config->get('admin_url'),
     ]);
@@ -96,14 +106,18 @@ class ImportForm extends FormBase {
 
     switch ($version) {
       case 2:
+        // creating kong entity for OAS v2
         $kongEntity = new OpenAPI2Kong($spec);
         break;
       case 3:
+        // creating kong entity for OAS v3
         $kongEntity = new OpenAPI3Kong($spec);
         break;
     }
 
+    // importing kong services to kong gateway
     $kongHttp->addService($kongEntity->getServices());
+    // importing kong routes to kong gateway
     $kongHttp->addRoutes($kongEntity->getRoutes());
     $this->messenger()->addStatus($this->t('Succesfully imported'));
   }

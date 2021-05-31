@@ -9,6 +9,14 @@ use Symfony\Component\Yaml\Yaml;
  */
 class Parser {
 
+  /**
+   * Parse Json Or Yml string
+   *
+   * @param String $data Yml or Json format
+   * @param String $format either json or yml
+   *
+   * @return Array Parsed data
+   */
   public static function parse($data, $format) {
     switch ($format) {
       case 'json':
@@ -20,14 +28,35 @@ class Parser {
     }
   }
 
+  /**
+   * Parse Json
+   *
+   * @param String $data Json format
+   *
+   * @return Array Parsed data
+   */
   public static function parseJson($data) {
     return json_decode($data, true);
   }
 
+  /**
+   * Parse Yml
+   *
+   * @param String $data yml format
+   *
+   * @return Array Parsed data
+   */
   public static function parseYml($data) {
     return Yaml::parse($data);
   }
 
+  /**
+   * Generated Yml from Associative array
+   *
+   * @param Array $data
+   *
+   * @return String yaml format
+   */
   public static function dump($data) {
     return Yaml::dump($data);
   }
