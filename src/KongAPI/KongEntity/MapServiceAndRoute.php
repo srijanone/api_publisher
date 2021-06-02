@@ -51,8 +51,22 @@ trait MapServiceAndRoute {
       'service' => ['name' => $route['service']],
       'name' => $this->sanitizeName($route['operationId']),
       'methods' => [strtoupper($route['method'])],
-      'paths' => [$route['path']],
+      'paths' => [$this->addPathParms($route['path'])],
     ];
+  }
+
+  /**
+   * Replace path params with kong specific path param.
+   * example  gretting/{user_id} to /gretting/(?P<user_id>)
+   *
+   * @param String $path Path of route
+   * @return String replaced string
+   */
+  protected function addPathParms($path) {
+    $pattern = '/\{(\w+)\}/';
+    $replacement = '(?P<${1}>)';
+
+    return preg_replace($pattern, $replacement, $path);
   }
 
   /**
