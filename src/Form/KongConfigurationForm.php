@@ -37,12 +37,28 @@ class KongConfigurationForm extends ConfigFormBase {
       '#required' => true,
     );
 
+    $form['kong']['username'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('User name'),
+      '#default_value' => $config->get('username'),
+      '#required' => true,
+    );
+
+    $form['kong']['password'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Password'),
+      '#default_value' => $config->get('password'),
+      '#required' => true,
+    );
+
     return parent::buildForm($form, $form_state);
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->config(KongConfigurationForm::CONFIG_ID)
       ->set('admin_url', $form_state->getValue('admin_url'))
+      ->set('username', $form_state->getValue('username'))
+      ->set('password', $form_state->getValue('password'))
       ->save();
 
     parent::submitForm($form, $form_state);

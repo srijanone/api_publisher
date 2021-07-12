@@ -4,4 +4,4 @@ description: "Publishing swagger spec to Kong API gateway "
 package: OpenAPI
 core_version_requirement: ^8 || ^9
 
-configure: kong_api_publisher.admin_settings
+configure: kong_api_publisher.configuration_form

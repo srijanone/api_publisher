@@ -4,6 +4,7 @@ namespace Drupal\kong_api_publisher\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\kong_api_publisher\KongAPI\KongEntity\OpenAPI2Kong;
 use Drupal\kong_api_publisher\KongAPI\KongEntity\OpenAPI3Kong;
 use Drupal\kong_api_publisher\KongAPI\KongHttpRequest;
@@ -30,22 +31,33 @@ class ImportForm extends FormBase {
   }
 
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['oas_version'] = array(
-      '#type' => 'select',
-      '#title' => $this->t('OpenAPI Spec Version'),
-      '#description' => $this->t("Please specify OpenAPI version"),
-      '#options' => $this->oas_versions,
-      '#default_value' => $this->defaultOasVersion,
-      '#required' => true,
-    );
+    $service_id = \Drupal::routeMatch()->getParameter('service_id');
+    $service = $this->getService($service_id);
 
     $form['oas_format'] = array(
       '#type' => 'select',
-      '#title' => $this->t('OpenAPI format'),
+      '#title' => $this->t('Open API format '),
       '#description' => $this->t("Please specify OpenAPI format"),
       '#placeholder' => $this->t('Enter open api spec'),
       '#options' => $this->oas_format,
-      '#default_value' => $this->defaultOasFormat,
+      '#default_value' => $service->format ? $service->format : $this->defaultOasFormat,
+      '#required' => true,
+    );
+
+    $form['oas_version'] = array(
+      '#type' => 'select',
+      '#title' => $this->t('Open API Spec Version'),
+      '#description' => $this->t("Please specify OpenAPI version"),
+      '#options' => $this->oas_versions,
+      '#default_value' => $service->oas_version ? $service->oas_version : $this->defaultOasVersion,
+      '#required' => true,
+    );
+
+    $form['spec_version'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Version'),
+      '#description' => $this->t("Add a version. Example: 1.0.0"),
+      '#default_value' => $service->version,
       '#required' => true,
     );
 
@@ -54,7 +66,7 @@ class ImportForm extends FormBase {
       '#title' => $this->t('OpenAPI spec'),
       '#description' => $this->t("Enter OpenAPI spec either JOSN or YML"),
       '#placeholder' => $this->t('Enter open api spec'),
-      '#default_value' => '',
+      '#default_value' => $service->spec ? $service->spec : '',
       '#rows' => 20,
       '#required' => true,
     );
@@ -66,19 +78,46 @@ class ImportForm extends FormBase {
       '#button_type' => 'primary',
     ];
 
+    $url = Url::fromRoute('kong_api_publisher.services');
+    $form['actions']['cancel'] = [
+      '#type' => 'link',
+      '#url' => $url,
+      '#title' => $this->t('Cancel'),
+    ];
+
     return $form;
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $spec = $form_state->getValue('oas');
-    $version = $form_state->getValue('oas_version');
+    $oas_version = $form_state->getValue('oas_version');
     $format = $form_state->getValue('oas_format');
+    $spec_version = $form_state->getValue('spec_version');
 
     try {
       // Parse Yml or Json string
       $parsedSpec = Parser::parse($spec, $format);
       // Importing parsed OAS into kong API gateway
-      $this->importKongConfig($parsedSpec, $version);
+      $data = $this->importKongConfig($parsedSpec, $oas_version);
+      $service = json_decode($data['service']);
+
+      $connection = \Drupal::service('database');
+      $query = $connection->merge('api_spec');
+      $query->key([
+        'service_id' => $service->id,
+      ])
+        ->fields([
+          'format' => $format,
+          'oas_version' => $oas_version,
+          'version' => $spec_version,
+          'spec' => $spec,
+          'name' => $service->name,
+          'service_id' => $service->id,
+          'updated_at' => time(),
+        ])
+        ->execute();
+      $form_state->setRedirect('kong_api_publisher.services');
+
     } catch (\Exception $e) {
       $this->messenger()->addError($this->t('Error in importing. <p>%msg</p>', [
         '%msg' => $e->getMessage(),
@@ -95,13 +134,13 @@ class ImportForm extends FormBase {
    * @param Number $version OAS version i.e. either OAS2 or OAS3
    */
   private function importKongConfig($spec, $version) {
-    $config = \Drupal::config(KongConfigurationForm::CONFIG_ID);
+    // $config = \Drupal::config(KongConfigurationForm::CONFIG_ID);
 
-    // creating kong http request based on configuration
-    $kongHttp = new KongHttpRequest([
-      'base_url' => $config->get('admin_url'),
-    ]);
-
+    // // creating kong http request based on configuration
+    // $kongHttp = new KongHttpRequest([
+    //   'base_url' => $config->get('admin_url'),
+    // ]);
+    $kongHttp = KongHttpRequest::getInstance();
     $kongEntity = null;
 
     switch ($version) {
@@ -116,9 +155,30 @@ class ImportForm extends FormBase {
     }
 
     // importing kong services to kong gateway
-    $kongHttp->addService($kongEntity->getServices());
+    $service = $kongHttp->addService($kongEntity->getServices());
     // importing kong routes to kong gateway
-    $kongHttp->addRoutes($kongEntity->getRoutes());
+    $routes = $kongHttp->addRoutes($kongEntity->getRoutes());
     $this->messenger()->addStatus($this->t('Succesfully imported'));
+
+    return [
+      'service' => $service,
+      'routes' => $routes,
+    ];
+  }
+
+  public function getService($service_id) {
+    $connection = \Drupal::service('database');
+    $query = $connection->select('api_spec', 'spec');
+    $query->fields('spec', [
+      'format',
+      'oas_version',
+      'version',
+      'spec',
+      'name',
+      'service_id',
+    ])
+      ->condition('spec.service_id', $service_id);
+
+    return $query->execute()->fetchObject();
   }
 }

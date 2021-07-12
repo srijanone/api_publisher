@@ -1,5 +1,5 @@
-kong_api_publisher.import_swagger:
+kong_api_publisher.configuration_form:
   title: Open API to kong
   description: Open API to kong configuration
-  route_name: kong_api_publisher.import_swagger
+  route_name: kong_api_publisher.configuration_form
   parent: system.admin_config_system

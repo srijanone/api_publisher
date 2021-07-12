@@ -1,0 +1,116 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ *
+ * Defines the database tables used by this module.
+ *
+ * @see hook_schema()
+ *
+ * @ingroup dbtng_example
+ */
+function kong_api_publisher_schema() {
+  $schema['api_spec'] = [
+    'description' => 'Stores API Spec.',
+    'fields' => [
+      'service_id' => [
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'description' => 'Service ID on kong.',
+      ],
+      'format' => [
+        'type' => 'varchar',
+        'length' => 5,
+        'not null' => TRUE,
+        'description' => 'Format of Spec either JSON or YML.',
+      ],
+      'oas_version' => [
+       'type' => 'int',
+        'not null' => TRUE,
+        'size' => 'tiny',
+        'description' => 'Open API spec version.',
+      ],
+      'version' => [
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => '1.0.0',
+        'description' => 'Version of spec.',
+      ],
+
+      'spec' => [
+        'type' => 'text',
+        'not null' => TRUE,
+        'description' => 'API spec.',
+      ],
+
+      'name' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'Service name.',
+      ],
+
+      'updated_at' => [
+       'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'Updated date.',
+      ],
+    ],
+    'primary key' => ['service_id'],
+  ];
+
+    $schema['policies'] = [
+    'description' => 'Policies',
+    'fields' => [
+      'plugin_id' => [
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'description' => 'plugin_id in kong .',
+       ],
+      'service_id' => [
+        'type' => 'varchar',
+        'length' => 50,
+        'not null' => TRUE,
+        'description' => 'Service ID on kong.',
+      ],
+      'name' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'Policy name.',
+      ],
+      'enabled' => [
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'description' => 'Policy enable or not.',
+      ],
+      'config' => [
+       'type' => 'text',
+        'description' => 'Policy Configuration.',
+      ],
+    ],
+    'primary key' => ['plugin_id'],
+    'unique keys' => [
+      'service_policy' => ['plugin_id', 'service_id']
+    ],
+    'foreign keys' => [
+      'plugin_service' => [
+        'table' => 'api_spec',
+        'columns' => [
+          'service_id' => 'service_id',
+        ],
+      ]
+    ],
+  ];
+
+  return $schema;
+}
+
+function kong_api_publisher_uninstall() {
+  drupal_uninstall_schema('kong_api_publisher');
+}

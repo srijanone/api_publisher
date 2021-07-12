@@ -1,4 +1,14 @@
-kong_api_publisher.import_swagger:
+kong_api_publisher.configuration_form:
+  path: "/admin/config/kong-api-publisher/config"
+  defaults:
+    _form: '\Drupal\kong_api_publisher\Form\KongConfigurationForm'
+    _title: "kong Configuration"
+  requirements:
+    _permission: "administer site configuration"
+  options:
+    _admin_route: TRUE
+
+kong_api_publisher.publish_api:
   path: "/admin/config/kong-api-publisher/import-oas"
   defaults:
     _form: '\Drupal\kong_api_publisher\Form\ImportForm'
@@ -8,11 +18,61 @@ kong_api_publisher.import_swagger:
   options:
     _admin_route: TRUE
 
-kong_api_publisher.configuration_form:
-  path: "/admin/config/kong-api-publisher/config"
+kong_api_publisher.edit_publish_api:
+  path: "/admin/config/kong-api-publisher/import-oas/{service_id}"
   defaults:
-    _form: '\Drupal\kong_api_publisher\Form\KongConfigurationForm'
-    _title: "kong Configuration"
+    _form: '\Drupal\kong_api_publisher\Form\ImportForm'
+    _title: "Edit Open API Spec to Kong"
+  requirements:
+    _permission: "administer site configuration"
+  options:
+    _admin_route: TRUE
+
+kong_api_publisher.services:
+  path: "/admin/config/kong-api-publisher/services"
+  defaults:
+    _form: '\Drupal\kong_api_publisher\Form\ServiceListForm'
+    _title: "Services"
+  requirements:
+    _permission: "administer site configuration"
+  options:
+    _admin_route: TRUE
+
+kong_api_publisher.policy_management:
+  path: "/admin/config/kong-api-publisher/policy-management"
+  defaults:
+    _form: '\Drupal\kong_api_publisher\Form\PolicyManagementForm'
+    _title: "Policy Management"
+  requirements:
+    _permission: "administer site configuration"
+  options:
+    _admin_route: TRUE
+
+kong_api_publisher.attach_map_policy:
+  path: "/admin/config/kong-api-publisher/map-polices/{service_id}"
+  defaults:
+    _form: '\Drupal\kong_api_publisher\Form\MapPolicyToServiceForm'
+    _title: "Map Polices to Service"
+  requirements:
+    _permission: "administer site configuration"
+  options:
+    _admin_route: TRUE
+
+kong_api_publisher.delete_service:
+  path: "/admin/config/kong-api-publisher/service/delete/{service_id}"
+  defaults:
+    _controller: '\Drupal\kong_api_publisher\Controller\ServiceController::deleteService'
+    _title: "Delete policy"
+  requirements:
+    _permission: "administer site configuration"
+  options:
+    _admin_route: TRUE
+
+kong_api_publisher.delete_policy:
+  path: "/admin/config/kong-api-publisher/polices/delete/{policy_id}"
+  defaults:
+    _controller: '\Drupal\kong_api_publisher\Controller\ServiceController::deletePolicy'
+    _title: "Delete policy"
   requirements:
     _permission: "administer site configuration"
   options:
