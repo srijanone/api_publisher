@@ -29,7 +29,7 @@ kong_api_publisher.edit_publish_api:
     _admin_route: TRUE
 
 kong_api_publisher.services:
-  path: "/admin/config/kong-api-publisher/services"
+  path: "/admin/config/kong-api-publisher/services/publish"
   defaults:
     _form: '\Drupal\kong_api_publisher\Form\ServiceListForm'
     _title: "Services"

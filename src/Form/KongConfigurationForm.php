@@ -32,23 +32,26 @@ class KongConfigurationForm extends ConfigFormBase {
     $form['kong']['admin_url'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Kong admin API'),
-      '#description' => $this->t('Enter kong admin URL i.e. localhost:8001'),
+      '#description' => $this->t('Enter kong admin URL, e.g. localhost:8081'),
       '#default_value' => $config->get('admin_url'),
       '#required' => true,
     );
 
-    $form['kong']['username'] = array(
+    $form['credentials'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Kong Credentials'),
+      '#description' => $this->t('Enter kong admin credentials if Kong Admin API is protected by username/password'),
+    ];
+    $form['credentials']['username'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('User name'),
       '#default_value' => $config->get('username'),
-      '#required' => true,
     );
 
-    $form['kong']['password'] = array(
+    $form['credentials']['password'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Password'),
       '#default_value' => $config->get('password'),
-      '#required' => true,
     );
 
     return parent::buildForm($form, $form_state);

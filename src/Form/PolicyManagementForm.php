@@ -3,6 +3,7 @@ namespace Drupal\kong_api_publisher\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\kong_api_publisher\Utils\Service;
 
@@ -51,9 +52,13 @@ class PolicyManagementForm extends FormBase {
       ];
     }
 
+    $doc_link = Link::fromTextAndUrl($this->t('Click'), Url::fromUri('https://docs.konghq.com/gateway-oss/2.4.x/proxy/#terminology'));
+    $form['#prefix'] = '<div id="policies-form-warpper"><h2>Polices</h2> Policy refers to the Kong “plugins”, which are pieces of business logic that run in the proxying lifecycle on a specific Routes and Services. for reference ' . $doc_link->toString();
+    $form['#suffix'] = '</div>';
     $form['delete'] = [
       '#type' => 'submit',
       '#value' => $this->t('Delete'),
+      '#attributes' => ['class' => ['delete_btn']],
       '#prefix' => '<div class="service-list">',
     ];
 
@@ -62,9 +67,11 @@ class PolicyManagementForm extends FormBase {
       '#header' => $header,
       '#options' => $options,
       '#empty' => $this
-        ->t('No services found'),
+        ->t('No policy found'),
       '#suffix' => '</div>',
     ];
+
+    $form['#attached']['library'][] = 'kong_api_publisher/kong_api_publisher';
 
     return $form;
   }

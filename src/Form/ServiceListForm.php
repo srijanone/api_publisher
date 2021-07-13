@@ -22,9 +22,7 @@ class ServiceListForm extends FormBase {
 
   public function buildForm(array $form, FormStateInterface $form_state) {
     $services = Service::getServices();
-    // $kongHttp = KongHttpRequest::getInstance();
-    // $p = $kongHttp->getPluginByService('1f7ec11f-2d5f-4edb-81da-2d927ef764fc');
-    // dsm($p);
+
     $header = [
       'service_name' => $this->t('Service Name'),
       'version' => $this->t('Version'),
@@ -62,26 +60,24 @@ class ServiceListForm extends FormBase {
       ];
     }
 
-    $form['#prefix'] = '<div id="service-form-warpper">';
+    $doc_link = Link::fromTextAndUrl($this->t('Click'), Url::fromUri('https://docs.konghq.com/gateway-oss/2.4.x/proxy/#terminology'));
+    $form['#prefix'] = '<div id="service-form-warpper"><h2>Services</h2> Service as the name implies, are abstractions of each of your own upstream services. Examples of Services would be a data transformation microservice, a billing API, etc. for reference ' . $doc_link->toString();
     $form['#suffix'] = '</div>';
     $form['add_text'] = [
-      '#markup' => 'Publish Drupal APIs using Kong',
+      // '#markup' => '<h4>Publish Drupal APIs using Kong</h4>',
       '#prefix' => '<div class="add-action">',
     ];
-
-    $link = Link::createFromRoute($this->t('Add'), 'kong_api_publisher.publish_api');
-    $form['add_markup'] = [
-      '#markup' => $link->toString(),
+    $form['add'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Add'),
+      '#submit' => ['::add_service_submit_handler'],
       '#suffix' => '</div> <hr>',
-    ];
-
-    $form['add_form'] = [
-      '#markup' => '<div id="add_form"></div>',
     ];
 
     $form['delete'] = [
       '#type' => 'submit',
       '#value' => $this->t('Delete'),
+      '#attributes' => ['class' => ['delete_btn']],
       '#prefix' => '<div class="service-list">',
     ];
 
@@ -94,9 +90,13 @@ class ServiceListForm extends FormBase {
       '#suffix' => '</div>',
     ];
 
-    // $form['#attached']['library'][] = 'kong_api_publisher/kong_api_publisher';
+    $form['#attached']['library'][] = 'kong_api_publisher/kong_api_publisher';
 
     return $form;
+  }
+
+  public function add_service_submit_handler(array &$form, FormStateInterface $form_state) {
+    $form_state->setRedirect('kong_api_publisher.publish_api');
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {

@@ -1,0 +1,5 @@
+kong_api_publisher:
+  version: 1.x
+  css:
+    theme:
+      css/service_list.css: {}

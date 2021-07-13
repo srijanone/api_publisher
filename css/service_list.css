@@ -1,0 +1,9 @@
+.add-action {
+  display: flex;
+  justify-content: flex-end;
+  margin: 10px 0;
+}
+
+.delete_btn {
+  margin: 10px 0;
+}
